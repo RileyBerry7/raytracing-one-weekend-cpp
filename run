@@ -1,5 +1,5 @@
 #!/bin/bash
 
-g++ main.cpp -o main 
+g++ main.cpp color.h vec3.h ray.h -o main 
 ./main > image.ppm
 feh image.ppm

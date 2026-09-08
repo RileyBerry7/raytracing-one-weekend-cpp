@@ -4,7 +4,35 @@
 
 #include <iostream>
 
+double hit_sphere(const point3& center, double radius, const ray& r) {
+    vec3 oc = center - r.origin();
+    auto a = r.direction().length_squared();
+    auto h = dot(oc, r.direction());
+    auto c = oc.length_squared() - radius*radius;
+    auto discriminant = h*h - a*c;
+    
+    if (discriminant < 0) return -1.0;
+    auto t = (h - std::sqrt(discriminant)) / a;
+    return t;
+    
+}
+
 color ray_color(const ray& r) {
+    auto center = point3(0,0,-1);
+    auto t = hit_sphere(center, 0.5, r);
+    if (t > 0.0) {
+        auto normal = unit_vector(r.at(t) - center);
+        return 0.5 * (normal + color(1,1,1));
+    }
+
+    center = point3(-2.1, 0.0,-1.8);
+    t = hit_sphere(center, 0.5, r);
+    if (t > 0.0) {
+        auto normal = unit_vector(r.at(t) - center);
+        return 0.5 * (normal + color(1,1,1));
+    }
+
+
     vec3 unit_direction = unit_vector(r.direction());
     auto a = 0.5*(unit_direction.y() + 1.0);
     return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0);
@@ -39,28 +67,15 @@ int main() {
     // PPM file header
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
     
-    for (int j = 0; j < image_width; j++) {
+    for (int j = 0; j < image_height; j++) {
         std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
-        for (int i = 0; i < image_height; i++) {            
+        for (int i = 0; i < image_width; i++) {            
             
             auto pixel_center  = pixel00_loc + (i * pixel_delta_u) + (j * pixel_delta_v);
             auto ray_direction = pixel_center - camera_center;
             ray r(camera_center, ray_direction);
             color pixel_color  = ray_color(r);  
 
-            // Normalize coordinates to a 0.0 to 1.0 range
-            //auto r = double(i) / (image_width - 1);
-            //auto g = double(j) / (image_height - 1);
-            //auto b = 0.0;
-            //auto pixel_color = color(double(i) / (image_width - 1), double(j) / (image_height -1), 0);
-    
-            // Convert color values to 8-bit integers
-            //int ir = int(255.999 * r);
-            //int ig = int(255.999 * g); 
-            //int ib = int(255.999 * b);
-
-            // Output RGB triplet for the current pixel
-            //std::cout << ir << ' ' << ig << ' ' << ib << '\n';
             write_color(std::cout, pixel_color);
         }
     }   
