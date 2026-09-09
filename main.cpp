@@ -4,12 +4,13 @@
 #include "hittable_list.h"
 #include "sphere.h"
 
-
+// Determine ray color
 color ray_color(const ray& r, const hittable& world) {
-    // Sphere
-    hit_record rec;
-    if (world.hit(r, 0, infinity, rec)) {
-        return 0.5 * (rec.normal + color(1, 1, 2));
+    hit_record record; // Create hit record
+    
+    // Check if ray hits
+    if (world.hit(r, interval(0, infinity), record)) {
+        return 0.5 * (record.normal + color(1, 1, 1));
     }
 
     // Background
@@ -29,6 +30,7 @@ int main() {
     // World
     hittable_list world;
     world.add(make_shared<sphere>(point3(0,0,-1), 0.5));
+    world.add(make_shared<sphere>(point3(-1.5,0,-2), 0.5));
     world.add(make_shared<sphere>(point3(0,-100.5,-1), 100));
 
     
