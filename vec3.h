@@ -15,27 +15,36 @@ public:
     vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); }
     double operator[](int i) const { return e[i]; }
     double& operator[](int i) { return e[i]; }
+
     vec3& operator+=(const vec3& v) {
         e[0] += v.e[0];
         e[1] += v.e[1];
         e[2] += v.e[2];
         return *this;
     }
-	vec3& operator*=(double t) {
+    vec3& operator*=(double t) {
         e[0] *= t;
         e[1] *= t;
         e[2] *= t;
         return *this;
-	}
-	vec3& operator/=(double t) {
+    }
+    vec3& operator/=(double t) {
         return *this *= 1/t;
-	}
-	double length() const {
+    }
+    double length() const {
         return std::sqrt(length_squared());
-	}
-        double length_squared() const {
+    }
+    double length_squared() const {
         return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
-	}
+    }
+    
+    static vec3 random() {
+        return vec3(random_double(), random_double(), random_double());
+    }
+    static vec3 random(double min, double max) {
+        return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
+    }
+
 };
 
 // point3 is just an alias for vec3, but useful for geometric clarity in the code.
