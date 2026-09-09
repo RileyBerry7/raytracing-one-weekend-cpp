@@ -13,9 +13,10 @@
 class camera {
 public:
     // Camera Parameters
-    double aspect_ratio;
-    int    image_width;
-    int    samples_per_pixel;
+    double aspect_ratio      = 1.0;
+    int    image_width       = 100;
+    int    samples_per_pixel = 10;
+    int    max_depth         = 10;
 
     void initialize() {
 
@@ -55,13 +56,9 @@ public:
                 color pixel_color(0,0,0);
                 for (int sample = 0; sample < samples_per_pixel; sample++) {
                     ray r = get_ray(i, j);
-                    pixel_color += ray_color(r, world);
+                    pixel_color += ray_color(r, max_depth, world);
                 }
 
-                //auto pixel_center  = pixel00_loc + (i * pixel_delta_u) + (j * pixel_delta_v);
-                //auto ray_direction = pixel_center - camera_center;
-                //ray r(camera_center, ray_direction);
-                //color pixel_color  = ray_color(r, world);  
                 write_color(std::cout, pixel_sample_scale * pixel_color);
             }
         }   
@@ -94,12 +91,18 @@ private:
         return vec3(random_double() - 0.5, random_double() - 0.5, 0);
     }
 
-    color ray_color(const ray& r, const hittable& world) const {
+    color ray_color(const ray& r, int depth, const hittable& world) const {
+        // If bounce limit is exceeded then return no light
+        if (depth <0) return color(0,0,0);
+
         hit_record record; // Create hit record
         
         // Check if ray hits
         if (world.hit(r, interval(0, infinity), record)) {
-            return 0.5 * (record.normal + color(1, 1, 1));
+
+            // Diffuse Material
+            vec3 direction = random_on_hemisphere(record.normal);
+            return 0.5 * ray_color(ray(record.p, direction), depth-1, world);
         }
 
         // Background
