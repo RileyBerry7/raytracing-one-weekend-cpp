@@ -98,10 +98,14 @@ private:
         hit_record record; // Create hit record
         
         // Check if ray hits
-        if (world.hit(r, interval(0, infinity), record)) {
+        if (world.hit(r, interval(0.001, infinity), record)) {
+            // The min value prevents shadow acne. Floating-point rounding erros make it 
+            // possible such that our intersection may be calculated inside of the object.
+
 
             // Diffuse Material
-            vec3 direction = random_on_hemisphere(record.normal);
+            //vec3 direction = record.normal + random_on_hemisphere(record.normal);
+            vec3 direction = record.normal + random_unit_vector();
             return 0.5 * ray_color(ray(record.p, direction), depth-1, world);
         }
 
