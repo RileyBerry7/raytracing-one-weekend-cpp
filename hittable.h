@@ -3,10 +3,13 @@
 
 #include "rtweekend.h"
 
+class material;
+
 class hit_record {
 public:
     point3 p;           // Intersection point
     vec3   normal;      // Surface normal (outwards/unit-vector)
+    shared_ptr<material> mat;
     double t;           // Distance from ray origin
     bool   front_face;  // Whether or not front face was hit
 
