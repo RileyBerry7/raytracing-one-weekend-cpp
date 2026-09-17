@@ -42,7 +42,8 @@ public:
         scattered   = ray(rec.p, scatter_direction);
         attenuation = albedo;
 
-        return true; // 
+        // Return reflection status
+        return true; //  Always true
     }
 private:
     color albedo;
@@ -53,7 +54,7 @@ private:
 class metal : public material {
 public:
     // Constructor
-    metal(const color& albedo) : albedo(albedo) {}
+    metal(const color& albedo, double fuzz) : albedo(albedo), fuzz(fuzz < 1 ? fuzz : 1) {}
 
     //***************************************************************************************************
     // METAL SCATTER
@@ -61,14 +62,20 @@ public:
         
         // Reflect incident ray
         vec3 reflection = reflect(r_in.direction(), rec.normal);
+
+        // Add fuzz
+        reflection = unit_vector(reflection) + (fuzz * random_unit_vector());
         
         // Save scattered ray
-        scattered       = ray(rec.p, reflection);
-        attenuation     = albedo;
-        return true;
+        scattered   = ray(rec.p, reflection);
+        attenuation = albedo;
+
+        // Return reflection status
+        return (dot(scattered.direction(), rec.normal) > 0); // True when ray & normal point in same direction
     }
 private:
     color albedo;
+    double fuzz;
 };
 
 //--------------------------------------------------------------------------------
