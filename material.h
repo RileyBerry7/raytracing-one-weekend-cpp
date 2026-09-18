@@ -94,10 +94,10 @@ public:
         double ri   = rec.front_face ? (1.0/refraction_index) : refraction_index;
 
         vec3 unit_direction = unit_vector(r_in.direction());
-        vec3 refracted      = refract(unit_direction, rec.nornal, ri);
+        vec3 refracted      = refract(unit_direction, rec.normal, ri);
 
         // Save scattered ray
-        scattered = ray(rec.p, refractred);
+        scattered = ray(rec.p, refracted);
 
         // Return reflection status
         return true; //  Always true
