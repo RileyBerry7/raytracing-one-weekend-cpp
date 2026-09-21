@@ -94,10 +94,21 @@ public:
         double ri   = rec.front_face ? (1.0/refraction_index) : refraction_index;
 
         vec3 unit_direction = unit_vector(r_in.direction());
-        vec3 refracted      = refract(unit_direction, rec.normal, ri);
+        double cos_theta    = std::fmin(dot(-unit_direction, rec.normal), 1.0);
+        double sin_theta    = std::sqrt(1.0 - cos_theta * cos_theta);
+
+        bool cannot_refract = ri * sin_theta > 1.0;
+        vec3 direction;
+
+        if (cannot_refract)
+            direction = reflect(unit_direction, rec.normal);
+        else
+            direction = refract(unit_direction, rec.normal, ri);
+
+        //vec3 refracted      = refract(unit_direction, rec.normal, ri);
 
         // Save scattered ray
-        scattered = ray(rec.p, refracted);
+        scattered = ray(rec.p, direction);
 
         // Return reflection status
         return true; //  Always true
