@@ -97,7 +97,7 @@ private:
         pixel00_loc              = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
         // Calculate camera defocus disk vectors
-        auto defocus_disk_radius = focus_distance * std::tan(degrees_to_radians(defocus_angle / 2));
+        auto defocus_radius = focus_distance * std::tan(degrees_to_radians(defocus_angle / 2));
         defocus_disk_u           = u * defocus_radius;
         defocus_disk_v           = v * defocus_radius;
     }
@@ -105,13 +105,14 @@ private:
     //**************************************************************************
     // GET RAY - generates a randomly sampled ray for the given pixel
     ray   get_ray(int i, int j) const { 
+        // Ray should originate from the defocus disk & point towards randomly sampled point on our current pixel
 
         auto offset        = sample_square();
         auto pixel_sample  = pixel00_loc 
                                 + ((i + offset.x()) * pixel_delta_u) 
                                 + ((j + offset.y()) * pixel_delta_v); // Apply random offset
         
-        auto ray_origin    = camera_center;             // eye (0,0,0)
+        auto ray_origin    = (defocus_angle <= 0) ? camera_center : defocus_disk_sample();
         auto ray_direction = pixel_sample - ray_origin; // tip - tail
 
         return ray(ray_origin, ray_direction);
@@ -121,6 +122,14 @@ private:
     vec3 sample_square() const {
         return vec3(random_double() - 0.5, random_double() - 0.5, 0);
     }
+
+    //**************************************************************************
+    // DEFOCUS DISK SAMPLE - returns random point in the camera's defocus disk
+    point3 defocus_disk_sample() const {
+        auto p = random_in_unit_disk();
+        return camera_center + (p[0] * defocus_disk_u) + (p[1] * defocus_disk_v);
+    }
+
     //**************************************************************************
     // RAY COLOR - recursively determines the color of a ray
     color ray_color(const ray& r, int depth, const hittable& world) const {
