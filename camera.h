@@ -22,6 +22,9 @@ public:
     point3 lookat   = point3(0,0,-1); // Determines camera direction
     vec3   vup      = vec3(0,1,0);    // Camera up direction (local rotation)
 
+    double defocus_angle    = 0;  // Variation angle of rays through each pixel
+    double focus_distance   = 10; // Distance between lookfrom and perfect focus plane
+
     //**************************************************************************
     void render(const hittable& world) {
         initialize();
@@ -56,6 +59,8 @@ private:
     vec3   pixel_delta_u;
     vec3   pixel_delta_v;
     vec3   u, v, w;         // Camera frame basis vectors
+    vec3   defocus_disk_u;  // Defocus disk horizonal radius
+    vec3   defocus_disk_v;  // Defocus disk vertical radius
 
     //**************************************************************************
     // INIALIZE
@@ -67,10 +72,10 @@ private:
         camera_center        = lookfrom;
 
         // Determine viewport dimensions
-        auto focal_length = (lookfrom - lookat).length();
+        //auto focal_length = (lookfrom - lookat).length(); // OLD - no longer needed
         auto theta           = degrees_to_radians(vfov);
         auto h               = std::tan(theta / 2);
-        auto viewport_height = 2 * h  * focal_length;
+        auto viewport_height = 2 * h  * focus_distance;
         //auto viewport_height = 2.0; // OLD 
         auto viewport_width  = viewport_height * (double(image_width) / image_height);
 
@@ -87,8 +92,14 @@ private:
         pixel_delta_u        = viewport_u / image_width;    // Pixel-to-pixel deltas
         pixel_delta_v        = viewport_v / image_height;   //
         
-        auto viewport_upper_left = camera_center - (focal_length * w) - viewport_u / 2 - viewport_v / 2;
+        // Calculate location of upper left pixel
+        auto viewport_upper_left = camera_center - (focus_distance * w) - viewport_u / 2 - viewport_v / 2;
         pixel00_loc              = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+
+        // Calculate camera defocus disk vectors
+        auto defocus_disk_radius = focus_distance * std::tan(degrees_to_radians(defocus_angle / 2));
+        defocus_disk_u           = u * defocus_radius;
+        defocus_disk_v           = v * defocus_radius;
     }
 
     //**************************************************************************
