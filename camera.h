@@ -17,30 +17,11 @@ public:
     int    image_width       = 100;
     int    samples_per_pixel = 10;
     int    max_depth         = 10;
-    double vfov              = 90; // Vertical view angle (fov)
+    double vfov              = 90;    // Vertical view angle (fov)
+    point3 lookfrom = point3(0,0,0);  // Camera center
+    point3 lookat   = point3(0,0,-1); // Determines camera direction
+    vec3   vup      = vec3(0,1,0);    // Camera up direction (local rotation)
 
-    //**************************************************************************
-    void initialize() {
-
-        image_height         = int(image_width / aspect_ratio);
-        image_height         = (image_height < 1) ? 1 : image_height; // Must be greater than 0
-        pixel_sample_scale   = 1.0 / samples_per_pixel;
-        auto focal_length    = 1.0;
-        auto theta           = degrees_to_radians(vfov);
-        auto h               = std::tan(theta / 2);
-        auto viewport_height = 2 * h  * focal_length;
-        //auto viewport_height = 2.0; // OLD 
-        //
-        auto viewport_width  = viewport_height * (double(image_width) / image_height);
-        camera_center        = point3(0,0,0);
-        auto viewport_u      = vec3(viewport_width, 0, 0);  // Viewport edge vectors
-        auto viewport_v      = vec3(0, -viewport_height, 0);//
-        pixel_delta_u        = viewport_u / image_width;    // Pixel-to-pixel deltas
-        pixel_delta_v        = viewport_v / image_height;   //
-        
-        auto viewport_upper_left = camera_center - vec3(0, 0, focal_length) - viewport_u/2 - viewport_v/2;
-        pixel00_loc              = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
-    }
     //**************************************************************************
     void render(const hittable& world) {
         initialize();
@@ -74,6 +55,41 @@ private:
     point3 pixel00_loc;
     vec3   pixel_delta_u;
     vec3   pixel_delta_v;
+    vec3   u, v, w;         // Camera frame basis vectors
+
+    //**************************************************************************
+    // INIALIZE
+    void initialize() {
+
+        image_height         = int(image_width / aspect_ratio);
+        image_height         = (image_height < 1) ? 1 : image_height; // Must be greater than 0
+        pixel_sample_scale   = 1.0 / samples_per_pixel;
+        camera_center        = lookfrom;
+
+        // Determine viewport dimensions
+        auto focal_length = (lookfrom - lookat).length();
+        auto theta           = degrees_to_radians(vfov);
+        auto h               = std::tan(theta / 2);
+        auto viewport_height = 2 * h  * focal_length;
+        //auto viewport_height = 2.0; // OLD 
+        auto viewport_width  = viewport_height * (double(image_width) / image_height);
+
+        // Calculate u, v, w, basis vectors for the camera coordinate frameo
+        w = unit_vector(lookfrom - lookat);
+        u = unit_vector(cross(vup, w));
+        v = cross(w, u);
+
+        // Calculate viewport edge vectors
+        auto viewport_u      = viewport_width  *  u; // Left to right
+        auto viewport_v      = viewport_height * -v; // Up to down
+
+        // Calculate pixel-to-pixel deltas
+        pixel_delta_u        = viewport_u / image_width;    // Pixel-to-pixel deltas
+        pixel_delta_v        = viewport_v / image_height;   //
+        
+        auto viewport_upper_left = camera_center - (focal_length * w) - viewport_u / 2 - viewport_v / 2;
+        pixel00_loc              = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+    }
 
     //**************************************************************************
     // GET RAY - generates a randomly sampled ray for the given pixel
