@@ -1,30 +1,41 @@
 #ifndef RAY_H
 #define RAY_H
-
-//#include "rtweekend.h"
+//--------------------------------------------------------------------------------
 #include "vec3.h"
 
+//==============================================================================
 class ray {
 public:
 
-    ray() {}
-    ray(const point3& origin, const vec3& direction) : orig(origin), dir(direction) {}
+    //**************************************************************************
+    // CONSTRUCTORS
+    
+    ray() {} // Default
 
-    ray(const point3& origin, const vec3& direction, double time) : orig(origin), dir(direction) {}
+    // Origin, direction, time
+    ray(const point3& origin, const vec3& direction, double time) 
+        : orig(origin), dir(direction), tm(time) {}
 
-    ray(const point3& origin, const vec3& direction) : ray(origin, direction, 0) {}
+    // Origin, direction
+    ray(const point3& origin, const vec3& direction) 
+        : ray(origin, direction, 0) {}
 
-    const point3& origin() const { return orig; }
-    const vec3& direction() const { return dir; }
-
+    //**************************************************************************
+    // GETTERS
+    const point3& origin()    const { return orig; }
+    const vec3&   direction() const { return dir;  }
+    double        time()      const { return tm;   }
+    
+    //**************************************************************************
+    // GET POINT ALONG RAY
     point3 at(double t) const {
         return orig + t*dir;
     }
-
+//==============================================================================
 private:
-    point3 orig;
-    vec3 dir;
-    double tim;
+    point3  orig; // ray source/origin
+    vec3    dir;  // ray direction
+    double  tm;   // ray time
 };
-
+//--------------------------------------------------------------------------------
 #endif
