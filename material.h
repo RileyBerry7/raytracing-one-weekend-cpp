@@ -39,7 +39,7 @@ public:
             scatter_direction = rec.normal; // Tiny rays may be rounded to zero vector
 
         // Save scattered ray
-        scattered   = ray(rec.p, scatter_direction);
+        scattered   = ray(rec.p, scatter_direction, r_in.time());
         attenuation = albedo;
 
         // Return reflection status
@@ -67,7 +67,7 @@ public:
         reflection = unit_vector(reflection) + (fuzz * random_unit_vector());
         
         // Save scattered ray
-        scattered   = ray(rec.p, reflection);
+        scattered   = ray(rec.p, reflection, r_in.time());
         attenuation = albedo;
 
         // Return reflection status
@@ -108,7 +108,7 @@ public:
         //vec3 refracted      = refract(unit_direction, rec.normal, ri);
 
         // Save scattered ray
-        scattered = ray(rec.p, direction);
+        scattered = ray(rec.p, direction, r_in.time());
 
         // Return reflection status
         return true; //  Always true
