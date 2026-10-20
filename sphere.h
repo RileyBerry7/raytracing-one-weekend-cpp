@@ -10,7 +10,11 @@ class sphere : public hittable {
 public:
     // Stationary Sphere
     sphere(const point3& static_center, double radius, shared_ptr<material> mat) 
-        : center(static_center, vec3(0,0,0)), radius(std::fmax(0,radius)), mat(mat) {}
+        : center(static_center, vec3(0,0,0)), radius(std::fmax(0,radius)), mat(mat) 
+    {
+        auto rvec = vec3(radius, radius, radius);
+        bbox      = aabb(static_center - rvec, static_center + rvec);
+    }
 
     // Moving Shere
     sphere(const point3& center1, const point3& center2, double radius, shared_ptr<material> mat) 
@@ -42,10 +46,13 @@ public:
 
         return true;
     }
-    
+   
+    aabb bounding_box() const override { return bbox; }
+
 private:
     ray    center;
     double radius;
+    aabb   bbox;
     shared_ptr<material> mat;
 };
 
