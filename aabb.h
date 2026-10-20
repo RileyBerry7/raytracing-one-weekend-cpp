@@ -22,6 +22,13 @@ public:
         z = (a[2] <= b[2]) ? interval(a[2], b[2]) : interval(b[2], a[2]); 
     }
 
+    aabb(const aabb& box0, const aabb& box1) {
+        x = interval(box0.x, box1.x);
+        y = interval(box0.y, box1.y);
+        z = interval(box0.z, box1.z);
+    }
+    
+
     //**************************************************************************
     // AXIS INTERVAL - returns interval of given axis
     const interval& axis_interval(int n) const {
