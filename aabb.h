@@ -35,7 +35,7 @@ public:
     bool hit(const ray& r, interval ray_t) const {
         // ray_t: inital intersection time interval, will be iteratively shrunk
         
-        const point3& ray_orig = r.orign();     // Anchor (Q)
+        const point3& ray_orig = r.origin();     // Anchor (Q)
         const vec3&   ray_dir  = r.direction(); // Direction (d)
 
         // Axis Loop
