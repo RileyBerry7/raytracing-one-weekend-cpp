@@ -47,7 +47,7 @@ public:
         } else {
             std::sort(std::begin(objects) + start, std::begin(objects) + end, comparator);
             auto mid = start + object_span / 2; // Cut input in half, divide into two subtrees
-            left     = std::make_sharec<bvh_node>(objects, start, mid); // Recursive call
+            left     = std::make_shared<bvh_node>(objects, start, mid); // Recursive call
             right    = std::make_shared<bvh_node>(objects, mid, end);   // Recursive call
         }
         // Calculate new bounding box
@@ -56,7 +56,7 @@ public:
 
     //******************************************************************************************************************
     // Check For Hit - Override
-    bool hit(const ray& r, interval ray_t, , hit_record& rec) const override {
+    bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
         if (!bbox.hit(r, ray_t))
             return false;
 
@@ -83,7 +83,7 @@ private:
     static bool box_compare(const std::shared_ptr<hittable> a, const std::shared_ptr<hittable> b, int axis_index) {
         auto a_axis_interval = a->bounding_box().axis_interval(axis_index);
         auto b_axis_interval = b->bounding_box().axis_interval(axis_index);
-        return a_axis_interval < b_axis_interval;
+        return a_axis_interval.min < b_axis_interval.min;
     }
 
     static bool box_x_compare(const std::shared_ptr<hittable> a, const std::shared_ptr<hittable> b) {
@@ -97,3 +97,4 @@ private:
     }
 };
 //________________________________________________________________________________________________________________________
+#endif

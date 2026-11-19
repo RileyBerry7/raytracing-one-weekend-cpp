@@ -1,5 +1,6 @@
 #include "rtweekend.h"
 
+#include "bvh.h"
 #include "camera.h"
 #include "hittable.h"
 #include "hittable_list.h"
@@ -54,7 +55,7 @@ int main() {
     world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
     // Generate BVH (Initates recursion)
-    world = hittable_list(std::make_shared<bvh_node>(world));
+    world = hittable_list(make_shared<bvh_node>(world));
 
     //auto material_bubble = make_shared<dielectric>(1.00 / 1.50);
     //world.add(make_shared<sphere>(point3(-1.0, 0.0, -1.0), 0.4, material_bubble));
