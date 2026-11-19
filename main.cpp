@@ -57,7 +57,7 @@ int main() {
     world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
     // Generate BVH (Initates recursion)
-    world = hittable_list(make_shared<bvh_node>(world)); // 6.5x speed up
+    world = hittable_list(make_shared<bvh_node>(world)); // 6.5x to 9.2x speed up
 
     //auto material_bubble = make_shared<dielectric>(1.00 / 1.50);
     //world.add(make_shared<sphere>(point3(-1.0, 0.0, -1.0), 0.4, material_bubble));

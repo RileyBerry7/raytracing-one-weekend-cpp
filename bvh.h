@@ -22,8 +22,16 @@ public:
     // Internal Node Constructor (Recursive)
     bvh_node(std::vector<shared_ptr<hittable>>& objects, size_t start, size_t end) {
         
+        // Build new bounding box upfront
+        bbox = aabb::empty;
+        for (size_t object_index=start; object_index < end; object_index++)
+            bbox =  aabb(bbox, objects[object_index]->bounding_box());
+
+        // Choose longest axis
+        int axis = bbox.longest_axis();
+
         // Randomly choose an axis to split on
-        int axis = random_int(0, 2);
+        //int axis = random_int(0, 2);
         
         // Ensure bounding box exists
         auto comparator = (axis == 0) ? box_x_compare // TODO: Must define these comparator functions
@@ -50,8 +58,6 @@ public:
             left     = std::make_shared<bvh_node>(objects, start, mid); // Recursive call
             right    = std::make_shared<bvh_node>(objects, mid, end);   // Recursive call
         }
-        // Calculate new bounding box
-        bbox = aabb(left->bounding_box(), right->bounding_box());
     }
 
     //******************************************************************************************************************

@@ -1,14 +1,15 @@
 #ifndef AABB_H
 #define AABB_H
-//--------------------------------------------------------------------------------
 
-//==============================================================================
 class aabb {
+    //**********************************************************************************************************************
+    // Attributes
 public:
     interval x, y, z; // Bounding intervals for each axis
+    static const aabb empty, universe;
 
-    //**************************************************************************
-    // CONSTRUCTORS
+    //**********************************************************************************************************************
+    // Constructors
 
     aabb() {} // empty by default
     
@@ -29,15 +30,15 @@ public:
     }
     
 
-    //**************************************************************************
-    // AXIS INTERVAL - returns interval of given axis
+    //**********************************************************************************************************************
+    // Axis Interval - returns interval of given axis
     const interval& axis_interval(int n) const {
         if (n == 1) return y;
         if (n == 2) return z;
         return x;
     }
 
-    //**************************************************************************
+    //**********************************************************************************************************************
     // HIT - calculates ray-bounding boz intersection
     bool hit(const ray& r, interval ray_t) const {
         // ray_t: inital intersection time interval, will be iteratively shrunk
@@ -67,6 +68,21 @@ public:
         }
         return true; // Time interval not empty = hit
     }
+
+    //**********************************************************************************************************************
+    // Get Longest Axis - return the index of the longest axis of the bbox
+    int longest_axis() const { 
+    
+        if (x.size() > y.size())
+            return x.size() > z.size() ? 0 : 2;
+        else
+            return y.size() > z.size() ? 1 : 2;
+    }
+
 };
 //--------------------------------------------------------------------------------
+
+const aabb aabb::empty    = aabb(interval::empty,    interval::empty,    interval::empty);
+const aabb aabb::universe = aabb(interval::universe, interval::universe, interval::universe);
+
 #endif
