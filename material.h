@@ -2,6 +2,7 @@
 #define MATERIAL_H
 //------------------------------------------------------------------------------------------------------
 #include "hittable.h"
+#include "texture.h"
 
 //------------------------------------------------------------------------------------------------------
 // This class has two important jobs:
@@ -25,12 +26,12 @@ public:
 class lambertian : public material {
 public:
     // Constructor
-    lambertian(const color& albedo) : albedo(albedo) {}
+    lambertian(const color& albedo) : tex(make_shared<solid_color>(albedo)) {}
+    lambertian(shared_ptr<texture> tex) : tex(tex) {}
 
     //***************************************************************************************************
     // DIFFUSE SCATTER
     virtual bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
-        //
         // Generate random scatter direction
         auto scatter_direction = rec.normal + random_unit_vector();
 
@@ -40,13 +41,14 @@ public:
 
         // Save scattered ray
         scattered   = ray(rec.p, scatter_direction, r_in.time());
-        attenuation = albedo;
+        //attenuation = albedo;
+        attenuation = tex->value(rec.u, rec.v, rec.p);
 
         // Return reflection status
         return true; //  Always true
     }
 private:
-    color albedo;
+    shared_ptr<texture> tex;
 };
 
 //=======================================================================================================

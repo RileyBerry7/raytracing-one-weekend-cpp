@@ -12,6 +12,8 @@ public:
     vec3   normal;      // Surface normal (outwards/unit-vector)
     shared_ptr<material> mat;
     double t;           // Distance from ray origin
+    double u;
+    double v;
     bool   front_face;  // Whether or not front face was hit
 
     void set_face_normal(const ray& r, const vec3& outward_normal) {

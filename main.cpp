@@ -6,16 +6,20 @@
 #include "hittable_list.h"
 #include "material.h"
 #include "sphere.h"
+#include "texture.h"
+
 #include <chrono>
 
 //==============================================================================
 int main() {
+    // Start timer
     auto start = std::chrono::steady_clock::now();
 
     // Initialize world
     hittable_list world;
 
-    auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
+    auto checker = make_shared<checker_texture>(0.32, color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
+    auto ground_material = make_shared<lambertian>(checker);
     world.add(make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
 
     for (int a = -11; a < 11; a++) {
@@ -31,7 +35,8 @@ int main() {
                     auto albedo = color::random() * color::random();
                     sphere_material = make_shared<lambertian>(albedo);
                     auto center2 = center + vec3(0, random_double(0,0.5), 0);
-                    world.add(make_shared<sphere>(center, center2, 0.2, sphere_material));
+                    //world.add(make_shared<sphere>(center, center2, 0.2, sphere_material)); // Dynamic
+                    world.add(make_shared<sphere>(center, 0.2, sphere_material));            // Static
                 } else if (choose_mat < 0.95) {
                     // Metal
                     auto albedo = color::random(0.5, 1);
