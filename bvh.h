@@ -24,8 +24,9 @@ public:
         
         // Randomly choose an axis to split on
         int axis = random_int(0, 2);
-
-        auto comparator = (axis == 0) ? box_x_compare
+        
+        // Ensure bounding box exists
+        auto comparator = (axis == 0) ? box_x_compare // TODO: Must define these comparator functions
                         : (axis == 1) ? box_y_compare
                                       : box_z_compare;
         // Quantity of input elements 
@@ -44,6 +45,7 @@ public:
         
         // More than 2 elements
         } else {
+            std::sort(std::begin(objects) + start, std::begin(objects) + end, comparator);
             auto mid = start + object_span / 2; // Cut input in half, divide into two subtrees
             left     = std::make_sharec<bvh_node>(objects, start, mid); // Recursive call
             right    = std::make_shared<bvh_node>(objects, mid, end);   // Recursive call
@@ -75,5 +77,23 @@ private:
     shared_ptr<hittable> right; // Right child
     aabb                 bbox;  // Bounding box
 
+    //******************************************************************************************************************
+    // Bounding Box Comparator Functions
+    
+    static bool box_compare(const std::shared_ptr<hittable> a, const std::shared_ptr<hittable> b, int axis_index) {
+        auto a_axis_interval = a->bounding_box().axis_interval(axis_index);
+        auto b_axis_interval = b->bounding_box().axis_interval(axis_index);
+        return a_axis_interval < b_axis_interval;
+    }
+
+    static bool box_x_compare(const std::shared_ptr<hittable> a, const std::shared_ptr<hittable> b) {
+        return box_compare(a, b, 0); 
+    }
+    static bool box_y_compare(const std::shared_ptr<hittable> a, const std::shared_ptr<hittable> b) {
+        return box_compare(a, b, 1); 
+    }
+    static bool box_z_compare(const std::shared_ptr<hittable> a, const std::shared_ptr<hittable> b) {
+        return box_compare(a, b, 2); 
+    }
 };
 //________________________________________________________________________________________________________________________
