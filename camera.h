@@ -47,8 +47,7 @@ public:
                 write_color(std::cout, pixel_sample_scale * pixel_color); // Write avg color to pixel
             }
         }   
-        std::clog << "\nDone.               \n";
-        
+        std::clog << "\nDone.\n";
     }
 //==============================================================================
 private:

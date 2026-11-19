@@ -6,9 +6,11 @@
 #include "hittable_list.h"
 #include "material.h"
 #include "sphere.h"
+#include <chrono>
 
 //==============================================================================
 int main() {
+    auto start = std::chrono::steady_clock::now();
 
     // Initialize world
     hittable_list world;
@@ -55,7 +57,7 @@ int main() {
     world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
     // Generate BVH (Initates recursion)
-    world = hittable_list(make_shared<bvh_node>(world));
+    world = hittable_list(make_shared<bvh_node>(world)); // 6.5x speed up
 
     //auto material_bubble = make_shared<dielectric>(1.00 / 1.50);
     //world.add(make_shared<sphere>(point3(-1.0, 0.0, -1.0), 0.4, material_bubble));
@@ -78,5 +80,14 @@ int main() {
 
     cam.render(world);
 
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    
+    int pixel_count = cam.image_width * cam.image_width / cam.aspect_ratio;
+    std::clog << "Pixel Count  : " << pixel_count << std::endl;
+    std::clog << "Samples/px   : " << cam.samples_per_pixel << std::endl;
+    std::clog << "Max Ray Depth: " << cam.max_depth << std::endl;
+    std::clog << "Runtime      : " << elapsed.count() << " seconds" << std::endl;
+    return 0;
 }
 //******************************************************************************

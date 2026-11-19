@@ -1,5 +1,10 @@
 #!/bin/bash
 
-g++ main.cpp -o main 
+set -e # Exit on failed command
+
+g++ main.cpp -o main
 ./main > image.ppm
 feh image.ppm
+
+# x && y -> y only runs if x succeeds
+# & creates a background process
