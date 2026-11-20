@@ -18,6 +18,11 @@ int main() {
     // Initialize world
     hittable_list world;
 
+    // Earth texture test
+    auto earth_texture = make_shared<image_texture>("earthmap.jpg");
+    auto earth_surface = make_shared<lambertian>(earth_texture);
+
+
     auto checker = make_shared<checker_texture>(0.32, color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
     auto ground_material = make_shared<lambertian>(checker);
     world.add(make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
@@ -59,7 +64,7 @@ int main() {
     world.add(make_shared<sphere>(point3(-4, 1, 0),  1.0, material2));
 
     auto material3   = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
-    world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
+    world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, earth_surface));
 
     // Generate BVH (Initates recursion)
     world = hittable_list(make_shared<bvh_node>(world)); // 6.5x to 9.2x speed up
