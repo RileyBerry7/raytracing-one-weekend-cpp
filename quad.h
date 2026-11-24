@@ -11,7 +11,7 @@ public:
         auto n = cross(u, v);
         normal = unit_vector(n);
         D      = dot(normal, Q);
-        W      = n / dot(n, n);
+        w      = n / dot(n, n);
 
         set_bounding_box();
     }
@@ -34,12 +34,12 @@ public:
 
         // Return false if the hit point parameter t is outside the ray interval
         auto t = (D - dot(normal, r.origin())) / denom;
-        if (!ray._t.contains(t)) return false;
+        if (!ray_t.contains(t)) return false;
 
         auto intersection = r.at(t);
         vec3 planar_hitpt_vector = intersection - Q;
-        auto alpha = dot(W, cross(planar_hitpt_vector, v));
-        auto beta  = dot(W, cross(u, planar_hitpt_vector));
+        auto alpha = dot(w, cross(planar_hitpt_vector, v));
+        auto beta  = dot(w, cross(u, planar_hitpt_vector));
 
         if (!is_interior(alpha, beta, rec)) return false;
 
@@ -57,7 +57,7 @@ public:
         // Given the hit point in plane coordinates, return false if it is outside the primitive,
         // otherwise set the hit record UV coordinates and return true.
 
-        if (!unit_interval.contains(a), || !unit_interval.contains(b)) return false;
+        if (!unit_interval.contains(a) || !unit_interval.contains(b)) return false;
 
         rec.u = a;
         rec.v = b;
