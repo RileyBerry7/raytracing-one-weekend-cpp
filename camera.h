@@ -25,6 +25,8 @@ public:
     double defocus_angle    = 0;  // Variation angle of rays through each pixel
     double focus_distance   = 10; // Distance between lookfrom and perfect focus plane
 
+    color  background;      // Scene background color
+
     //**************************************************************************
     void render(const hittable& world) {
         initialize();
@@ -60,7 +62,6 @@ private:
     vec3   u, v, w;         // Camera frame basis vectors
     vec3   defocus_disk_u;  // Defocus disk horizonal radius
     vec3   defocus_disk_v;  // Defocus disk vertical radius
-    color  background;      // Scene background color
 
     //**************************************************************************
     // INIALIZE
