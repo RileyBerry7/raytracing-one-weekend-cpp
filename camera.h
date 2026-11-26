@@ -60,6 +60,7 @@ private:
     vec3   u, v, w;         // Camera frame basis vectors
     vec3   defocus_disk_u;  // Defocus disk horizonal radius
     vec3   defocus_disk_v;  // Defocus disk vertical radius
+    color  background;      // Scene background color
 
     //**************************************************************************
     // INIALIZE
@@ -134,25 +135,39 @@ private:
     // RAY COLOR - recursively determines the color of a ray
     color ray_color(const ray& r, int depth, const hittable& world) const {
 
-        if (depth <0) return color(0,0,0); // Bounce limit exceeded
-        hit_record record;                 // Create hit record
+        if (depth < 0) return color(0,0,0); // Bounce limit exceeded
+        hit_record rec;                     // Create hit record
         
-        // Ray hit
-        if (world.hit(r, interval(0.001, infinity), record)) { // Min value prevents shadow acne
+        //vec3 direction = record.normal + random_unit_vector();            // Lambertian diffuse
+        //return 0.5 * ray_color(ray(record.p, direction), depth-1, world); // Light bounce(recursive)
 
-            ray scattered;
-            color attenuation;
-            if (record.mat->scatter(r, record, attenuation, scattered))
-                return attenuation * ray_color(scattered, depth-1, world);
-            return color(0,0,0);
-
-            //vec3 direction = record.normal + random_unit_vector();            // Lambertian diffuse
-            //return 0.5 * ray_color(ray(record.p, direction), depth-1, world); // Light bounce(recursive)
-        }
+        // BACKGROUND LERP
+        //vec3 unit_direction = unit_vector(r.direction());             //
+        //auto a              = 0.5*(unit_direction.y() + 1.0);         // Linear interpolation 
+        //return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0); // Sky color
+        
         // Ray miss (background)
-        vec3 unit_direction = unit_vector(r.direction());             //
-        auto a              = 0.5*(unit_direction.y() + 1.0);         // Linear interpolation 
-        return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0); // Sky color
+        if (!world.hit(r, interval(0.001, infinity), rec))
+            // Ray hit the sky so we return the sky color.
+            // The minimum bound prevents rounding error shadow acne.
+            return background;
+        
+        ray   scattered; 
+        color attenuation;
+        color color_from_emission = rec.mat->emitted(rec.u, rec.v, rec.p);
+        
+        // Ray doesn't scatter
+        if (!rec.mat->scatter(r, rec, attenuation, scattered))
+            // Hit material absorbs 100% of incoming light, thus any and all 
+            // outgoing light is whatever light the material itself produces.
+            return color_from_emission;
+
+        // Ray does scatter:
+        // Calculate scatter color (Recursive call)
+        color color_from_scatter = attenuation * ray_color(scattered, depth-1, world);
+        
+        // Total outgoing light is a sum of the emitted light and the scattered light(incoming light which wasn't absorbed).
+        return color_from_emission + color_from_scatter;
     }
 };
 //--------------------------------------------------------------------------------
