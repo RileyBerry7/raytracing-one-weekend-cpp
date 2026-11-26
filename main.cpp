@@ -25,9 +25,9 @@ void cornell_box(hittable_list& world, camera& cam) {
     world.add(make_shared<quad>(point3(0,0,555), vec3(555,0,0), vec3(0,555,0), white));
 
     cam.aspect_ratio = 1.0;
-    cam.image_width = 600;
-    cam.samples_per_pixel = 200;
-    cam.max_depth = 50;
+    cam.image_width = 200;
+    cam.samples_per_pixel = 4;
+    cam.max_depth = 1;
     //cam.background = color(0,0,0);
     cam.vfov = 40;
     cam.lookfrom = point3(278, 278, -800);
